@@ -13,7 +13,7 @@ namespace adatbazisAlapok
         static void Main(string[] args)
         {
 
-            using (var conn = new SQLiteConnection("Data Source=mydb.db"))//fájlkiterjesztésnek akár sqlite, vagy sqlite3|:memory:; -> memóriában tárolja az adatbázist, tesztelésre jó
+            using (var conn = new SQLiteConnection("Data Source=mydb.db"))//fájlkiterjesztésnek akár sqlite, vagy sqlite3|:memory: -> memóriában tárolja az adatbázist, tesztelésre jó
             {
                 //system.data.sqlite paranccsal töltsük le
                 conn.Open();
@@ -24,13 +24,13 @@ namespace adatbazisAlapok
                 meret INTEGER NOT NULL)";
                 command.ExecuteNonQuery();
 
-                var beszurCmd = conn.CreateCommand();
+                /*var beszurCmd = conn.CreateCommand();
                 beszurCmd.CommandText = @"INSERT INTO macskak(nev,meret) VALUES (@nev,@meret)";
                 beszurCmd.Parameters.AddWithValue("@nev", "Kormos");
                 beszurCmd.Parameters.AddWithValue("@meret", 41);
                 beszurCmd.ExecuteNonQuery();
 
-                /*var beszurCmd = conn.CreateCommand();
+                var beszurCmd = conn.CreateCommand();
                 beszurCmd.CommandText= @"INSERT INTO macskak (nev, meret) VALUES ('Tigris',45), ('Cirmi',20),('Pici',120)";
                 beszurCmd.ExecuteNonQuery();*/
 
@@ -52,10 +52,76 @@ namespace adatbazisAlapok
                 //' OR 1=1; --    az összes adatot visszaadja a táblából
                 // SQL injection
                 //mysql real escape string
+                Console.WriteLine("Melyik id?");
+                string userIdStr = Console.ReadLine();
+                int userId;
+                if (!int.TryParse(userIdStr, out userId))
+                {
+                    Console.WriteLine("Érvénytelen id");
+                    return;
+                }
+
+                var lekerdezIdAlapjan = conn.CreateCommand();
+                lekerdezIdAlapjan.CommandText = @"SELECT id, nev,meret FROM macskak WHERE id=@id";
+                lekerdezIdAlapjan.Parameters.AddWithValue("@id", userId);
+                using (var reader = lekerdezIdAlapjan.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int id = reader.GetInt32(0);
+                        string nev = reader.GetString(1);
+                        int meret = reader.GetInt32(2);
+                        Console.WriteLine("{0}, {1}cm ({2})", nev, meret, id);
+                    }
+                }
+
+                Console.WriteLine("Melyik név?");
+                string userNevStr = Console.ReadLine();
+
+                var lekerdezNevAlapjan = conn.CreateCommand();
+                lekerdezNevAlapjan.CommandText = @"SELECT id, nev,meret FROM macskak WHERE nev=@nev";
+                lekerdezNevAlapjan.Parameters.AddWithValue("@nev", userNevStr);
+                using (var reader = lekerdezNevAlapjan.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int id = reader.GetInt32(0);
+                        string nev = reader.GetString(1);
+                        int meret = reader.GetInt32(2);
+                        Console.WriteLine("{0}, {1}cm ({2})", nev, meret, id);
+                    }
+                }
+                Console.WriteLine("Mekkora macska kell?");
+                string userMeretSt = Console.ReadLine();
+                int userMeretKis;
+                if (!int.TryParse(userMeretSt, out userMeretKis))
+                {
+                    Console.WriteLine("Érvénytelen méret");
+                    return;
+                }
+                var lekerdezKisebbMeret = conn.CreateCommand();
+                lekerdezKisebbMeret.CommandText = @"SELECT Count(nev) FROM macskak WHERE meret<=@meret";
+                lekerdezKisebbMeret.Parameters.AddWithValue("@meret", userMeretKis);
+                long kisebbdb = (long)lekerdezKisebbMeret.ExecuteScalar();
+                Console.WriteLine(kisebbdb);
+
+                Console.WriteLine("Melyik azonosítójú macska kell?");
+                string userAzonStr = Console.ReadLine();
+                int userAzon;
+                if (!int.TryParse(userAzonStr, out userAzon))
+                {
+                    Console.WriteLine("Érvénytelen id");
+                    return;
+                }
+                Console.WriteLine("Mi legyen a macska neve?");
+                string userUjNev = Console.ReadLine();
+                var UjNevIdRa = conn.CreateCommand();
+                UjNevIdRa.CommandText = @"UPDATE macskak SET nev=@nev WHERE id=@id";
+                UjNevIdRa.Parameters.AddWithValue("@id", userAzon);
+                UjNevIdRa.Parameters.AddWithValue("@nev", userUjNev);
 
 
-
-                var lekerdezesCmd = conn.CreateCommand();
+                /*var lekerdezesCmd = conn.CreateCommand();
                 lekerdezesCmd.CommandText = @"
                 SELECT id,nev,meret
                 FROM macskak
@@ -71,6 +137,7 @@ namespace adatbazisAlapok
                         Console.WriteLine("{0}, {1}cm ({2})",nev,meret,id);
                     }
                 }
+                */
 
 
 
