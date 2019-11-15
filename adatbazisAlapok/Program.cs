@@ -119,6 +119,8 @@ namespace adatbazisAlapok
                 UjNevIdRa.CommandText = @"UPDATE macskak SET nev=@nev WHERE id=@id";
                 UjNevIdRa.Parameters.AddWithValue("@id", userAzon);
                 UjNevIdRa.Parameters.AddWithValue("@nev", userUjNev);
+                UjNevIdRa.ExecuteNonQuery();
+                Console.WriteLine("OK");
 
 
                 /*var lekerdezesCmd = conn.CreateCommand();
@@ -138,26 +140,9 @@ namespace adatbazisAlapok
                     }
                 }
                 */
-
-
-
-
-
-
-
-
                 Console.ReadLine();
 
-
-                
-
-
-
             }
-
-
-
-
 
         }
     }
